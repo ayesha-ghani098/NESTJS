@@ -19,13 +19,13 @@ export class ProductsController {
   // ADD PRODUCT
   // post method to add
   @Post()
-  addProduct(
+  async addProduct(
     // @Body() completeBody : {title: string,description: string, price: number} // Another way to represent
     @Body('title') prodTitle: string,
     @Body('description') prodDesc: string,
     @Body('price') prodPrice: number,
-  ): any {
-    const generatedId = this.productsService.insertProduct(
+  ) {
+    const generatedId = await this.productsService.insertProduct(
       prodTitle,
       prodDesc,
       prodPrice,
@@ -35,31 +35,42 @@ export class ProductsController {
 
   //GET ALL PRODUCTS
   @Get()
-  getAllProducts() {
-    return { products: this.productsService.fetchProducts() };
-    // return this.productsService.fetchProducts();
+  async getAllProducts() {
+    const products = await this.productsService.fetchProducts();
+    return { products: products };
   }
 
   @Get(':id')
   // @Param : getting data inside id parameter
-  getProduct(@Param('id') prodId: string) {
-    return this.productsService.fetchSingleProduct(prodId);
+  async getProduct(@Param('id') prodId: string) {
+    const product = await this.productsService.fetchSingleProduct(prodId);
+    return {
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+    };
   }
 
   @Patch(':id')
-  updateProduct(
+  async updateProduct(
     @Param('id') prodId: string,
     @Body('title') prodTitle: string,
     @Body('description') prodDesc: string,
     @Body('price') prodPrice: number,
   ) {
-    this.productsService.updateProduct(prodId, prodTitle, prodDesc, prodPrice);
+    await this.productsService.updateProduct(
+      prodId,
+      prodTitle,
+      prodDesc,
+      prodPrice,
+    );
     return null;
   }
 
   @Delete(':id')
-  deleteProduct(@Param('id') prodId: string) {
-    this.productsService.deleteProduct(prodId);
+  async deleteProduct(@Param('id') prodId: string) {
+    await this.productsService.deleteProduct(prodId);
     return null;
   }
 }
